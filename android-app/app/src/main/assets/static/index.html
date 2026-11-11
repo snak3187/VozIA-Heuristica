@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#6366f1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>VozIA Studio — Texto a Voz Humanizada (MP3)</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/png" href="/static/logo_round.png" />
+  <link rel="apple-touch-icon" href="/static/logo_round.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <!-- Top Navigation -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo-ring">
+        <img src="/static/logo_round.png" alt="Heuristica VozIA Logo" class="brand-icon" />
+      </div>
+      <h1>VozIA <span class="badge-pro">HEURISTICA</span></h1>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="container">
+    <!-- Left Column: Editor + Controls -->
+    <section class="studio-grid">
+      <div class="card editor-card">
+        <div class="card-header">
+          <div class="title-input-wrap">
+            <input type="text" id="audioTitle" class="title-input" placeholder="Título del audio o capítulo (opcional)..." maxlength="60" />
+          </div>
+          <div class="editor-toolbar">
+            <label for="fileUpload" id="lblFileUpload" class="btn-chip btn-chip-highlight" title="Subir archivo PDF, Word (.docx) o Texto (.txt)">
+              📄 Subir PDF / Word / TXT
+              <input type="file" id="fileUpload" accept=".pdf,.docx,.txt,.md,.srt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain" hidden />
+            </label>
+            <button type="button" id="btnInsertPause" class="btn-chip" title="Insertar pausa natural donde está el cursor">
+              ⏱️ + Pausa
+            </button>
+            <button type="button" id="btnSampleText" class="btn-chip" title="Insertar texto de demostración">
+              ✨ Demo
+            </button>
+            <button type="button" id="btnClearText" class="btn-chip btn-chip-danger" title="Limpiar editor">
+              🗑️ Limpiar
+            </button>
+          </div>
+        </div>
+
+        <div class="textarea-wrapper">
+          <textarea
+            id="textInput"
+            placeholder="Escribe o pega aquí tu texto, guion, artículo o libro completo...&#10;&#10;💡 Tip: Los textos largos o libros se dividen automáticamente por párrafos sin perder entonación y se unen en un solo archivo MP3 listo para descargar."
+          ></textarea>
+        </div>
+
+        <div class="editor-footer">
+          <div class="stats-pills">
+            <span class="stat-pill"><strong id="charCount">0</strong> caracteres</span>
+            <span class="stat-pill"><strong id="wordCount">0</strong> palabras</span>
+            <span class="stat-pill"><strong id="chunkCount">0</strong> bloques</span>
+            <span class="stat-pill">⏱️ ~<strong id="estDuration">0s</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Voice & Prosody Settings -->
+      <div class="card controls-card">
+        <h2 class="section-title">🎙️ Selección de Voz Neuronal</h2>
+
+        <!-- Filters -->
+        <div class="filters-row">
+          <div class="form-group">
+            <label for="langFilter">Idioma</label>
+            <select id="langFilter" class="select-input">
+              <option value="es">Español (Todos)</option>
+              <option value="en">Inglés</option>
+              <option value="pt">Portugués</option>
+              <option value="fr">Francés</option>
+              <option value="de">Alemán</option>
+              <option value="it">Italiano</option>
+              <option value="all">Todos los idiomas</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="regionFilter">País / Acento</label>
+            <select id="regionFilter" class="select-input">
+              <option value="all">Todos los acentos</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Gender Filter Tabs -->
+        <div class="gender-tabs" role="radiogroup" aria-label="Filtro de género">
+          <button type="button" class="gender-tab active" data-gender="all">Todos</button>
+          <button type="button" class="gender-tab" data-gender="Female">👩 Femenina</button>
+          <button type="button" class="gender-tab" data-gender="Male">👨 Masculina</button>
+        </div>
+
+        <!-- Voice Selector + Quick Preview -->
+        <div class="form-group voice-select-group">
+          <label for="voiceSelect">Voz Humanizada (<span id="voiceCountBadge">0</span> disponibles)</label>
+          <div class="voice-select-row">
+            <select id="voiceSelect" class="select-input voice-dropdown"></select>
+            <button type="button" id="btnPreviewVoice" class="btn btn-icon" title="Escuchar muestra rápida de esta voz">
+              🔊 Probar
+            </button>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="sliders-header">
+          <h2 class="section-title">🎚️ Expresión y Prosodia</h2>
+          <button type="button" id="btnResetSliders" class="btn-link">Restablecer</button>
+        </div>
+
+        <!-- Presets -->
+        <div class="presets-row">
+          <button type="button" class="preset-chip active" data-rate="0" data-pitch="0" data-pause="natural">✨ Natural</button>
+          <button type="button" class="preset-chip" data-rate="-8" data-pitch="-3" data-pause="narrator">📖 Audiolibro</button>
+          <button type="button" class="preset-chip" data-rate="12" data-pitch="2" data-pause="natural">⚡ Dinámico / Reels</button>
+          <button type="button" class="preset-chip" data-rate="-12" data-pitch="-6" data-pause="narrator">🎙️ Documental</button>
+        </div>
+
+        <!-- Rate Slider -->
+        <div class="slider-group">
+          <div class="slider-label">
+            <span>Velocidad de lectura</span>
+            <span id="rateValue" class="slider-badge">Normal (0%)</span>
+          </div>
+          <input type="range" id="rateSlider" min="-50" max="75" step="1" value="0" />
+        </div>
+
+        <!-- Pitch Slider -->
+        <div class="slider-group">
+          <div class="slider-label">
+            <span>Tono de voz (Pitch)</span>
+            <span id="pitchValue" class="slider-badge">Natural (0 Hz)</span>
+          </div>
+          <input type="range" id="pitchSlider" min="-35" max="35" step="1" value="0" />
+        </div>
+
+        <!-- Volume Slider -->
+        <div class="slider-group">
+          <div class="slider-label">
+            <span>Volumen / Ganancia</span>
+            <span id="volumeValue" class="slider-badge">100% (0%)</span>
+          </div>
+          <input type="range" id="volumeSlider" min="-40" max="40" step="1" value="0" />
+        </div>
+
+        <!-- Pause Mode -->
+        <div class="form-group">
+          <label for="pauseMode">Modo de respiración y pausas (Textos largos)</label>
+          <select id="pauseMode" class="select-input">
+            <option value="natural">Respiración conversacional fluida</option>
+            <option value="narrator">Narrador de libros (Pausas marcadas entre párrafos)</option>
+            <option value="none">Lectura continua rápida</option>
+          </select>
+        </div>
+
+        <!-- Primary Action Button -->
+        <button type="button" id="btnSynthesize" class="btn btn-primary btn-generate">
+          <span class="btn-text">🎧 Convertir a Voz Humanizada</span>
+          <span class="spinner hidden" id="synthSpinner"></span>
+        </button>
+        <p id="statusMessage" class="status-msg"></p>
+      </div>
+    </section>
+
+    <!-- Active Player Banner -->
+    <section id="nowPlayingCard" class="card player-card hidden">
+      <div class="player-info">
+        <div class="pulse-visualizer" id="audioVisualizer">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="player-meta">
+          <span class="now-playing-tag">LISTO PARA ESCUCHAR Y DESCARGAR</span>
+          <h3 id="playerTitle">Audio generado</h3>
+          <p id="playerSubtitle">Voz: es-MX-DaliaNeural • Tamaño: 0 KB</p>
+        </div>
+      </div>
+
+      <div class="player-controls-wrap">
+        <audio id="mainAudioPlayer" controls preload="metadata"></audio>
+        <a id="btnDownloadMain" href="#" download class="btn btn-success">
+          ⬇️ Descargar MP3
+        </a>
+      </div>
+    </section>
+
+    <!-- History Section -->
+    <section class="card history-card">
+      <div class="history-header">
+        <div>
+          <h2 class="section-title">🗂️ Historial de Audios Generados (MP3)</h2>
+        </div>
+        <button type="button" id="btnRefreshHistory" class="btn-chip">🔄 Actualizar</button>
+      </div>
+
+      <div id="historyList" class="history-list">
+        <div class="empty-state">Cargando historial...</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
+

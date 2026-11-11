@@ -1,0 +1,24 @@
+{
+  "name": "VozIA Heuristica - Texto a Voz Humanizada",
+  "short_name": "VozIA",
+  "description": "Convierte texto, PDF y Word a voz neuronal humanizada con descarga directa en MP3",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#a855f7",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/static/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
